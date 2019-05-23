@@ -35,7 +35,7 @@ public class SignCallBackTest {
 
 
         List<String> words =
-                Arrays.asList("手动马赛克".split(" "));
+                Arrays.asList("stairs merit soon tenant bamboo wool tenant job local moral human warm box oil bind prosper organ exchange mother ship suggest hint elegant siren".split(" "));
 
         String privateKey = Crypto.getPrivateKeyFromMnemonicCode(words);
         ECKey ecKey = ECKey.fromPrivate(new BigInteger(privateKey, 16));

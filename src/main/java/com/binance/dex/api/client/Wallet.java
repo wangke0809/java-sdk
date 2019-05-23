@@ -59,7 +59,6 @@ public class Wallet {
                 }
 
             }
-            System.out.println(publicKey);
             this.signCallBack = signCallBack;
             this.privateKey = null;
             this.env = env;
