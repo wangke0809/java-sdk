@@ -10,6 +10,7 @@ import com.binance.dex.api.client.ledger.LedgerKey;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bitcoinj.core.ECKey;
+import org.spongycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -30,6 +31,55 @@ public class Wallet {
     private BinanceDexEnvironment env;
 
     private String chainId;
+
+    /**
+     * add by wangke start
+     **/
+    private SignCallBack signCallBack;
+
+    public SignCallBack getSignCallBack() {
+        return signCallBack;
+    }
+
+    /**
+     * 签名回调
+     *
+     * @param publicKey
+     * @param env
+     * @param signCallBack
+     */
+    public Wallet(String publicKey, BinanceDexEnvironment env, SignCallBack signCallBack) {
+        if (!StringUtils.isEmpty(publicKey)) {
+            // BNB 生成地址用的是压缩后公钥，这里判断和转换一下
+            if ("04".equals(publicKey.substring(0, 2)) && publicKey.length() == 130) {
+                if (Integer.parseInt(publicKey.substring(128, 130), 16) % 2 == 0) {
+                    publicKey = "02" + publicKey.substring(2, 66);
+                } else {
+                    publicKey = "03" + publicKey.substring(2, 66);
+                }
+
+            }
+            System.out.println(publicKey);
+            this.signCallBack = signCallBack;
+            this.privateKey = null;
+            this.env = env;
+            this.ecKey = ECKey.fromPublicOnly(Hex.decode(publicKey));
+            this.address = Crypto.getAddressFromECKey(this.ecKey, env.getHrp());
+            this.addressBytes = Crypto.decodeAddress(this.address);
+            byte[] pubKey = ecKey.getPubKeyPoint().getEncoded(true);
+            byte[] pubKeyPrefix = MessageType.PubKey.getTypePrefixBytes();
+            this.pubKeyForSign = new byte[pubKey.length + pubKeyPrefix.length + 1];
+            System.arraycopy(pubKeyPrefix, 0, this.pubKeyForSign, 0, pubKeyPrefix.length);
+            pubKeyForSign[pubKeyPrefix.length] = (byte) 33;
+            System.arraycopy(pubKey, 0, this.pubKeyForSign, pubKeyPrefix.length + 1, pubKey.length);
+        } else {
+            throw new IllegalArgumentException("Private key cannot be empty.");
+        }
+    }
+
+    /**
+     * add by wangke end
+     **/
 
     public Wallet(String privateKey, BinanceDexEnvironment env) {
         if (!StringUtils.isEmpty(privateKey)) {
