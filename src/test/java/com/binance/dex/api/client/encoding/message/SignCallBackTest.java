@@ -1,7 +1,5 @@
 package com.binance.dex.api.client.encoding.message;
 
-import com.binance.dex.api.client.BinanceDexApiClientFactory;
-import com.binance.dex.api.client.BinanceDexApiNodeClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.TransactionMetadata;
@@ -14,7 +12,6 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -27,11 +24,10 @@ import java.util.List;
  */
 @Ignore("Manual run only")
 public class SignCallBackTest {
-    BinanceDexApiNodeCustomClient binanceDexNodeApi = new BinanceDexApiNodeCustomClient(BinanceDexEnvironment.TEST_NET_NODE.getBaseUrl(), BinanceDexEnvironment.TEST_NET_NODE.getHrp());
+    BinanceDexApiNodeCustomClient binanceDexNodeApi = new BinanceDexApiNodeCustomClient("http://data-seed-pre-0-s3.binance.org", "tbnb");
 
     @Test
-    public void test() throws Exception{
-
+    public void test() throws Exception {
 
 
         List<String> words =
@@ -46,7 +42,7 @@ public class SignCallBackTest {
 //        Wallet wallet = Wallet.createWalletFromMnemonicCode(words, BinanceDexEnvironment.TEST_NET);
         Wallet wallet = new Wallet(ecKey.decompress().getPublicKeyAsHex(),
                 BinanceDexEnvironment.TEST_NET,
-                (byte[] msgHash)->{
+                (byte[] msgHash) -> {
                     ECKey.ECDSASignature signature = ecKey.sign(Sha256Hash.wrap(msgHash));
 
                     byte[] result = new byte[64];
@@ -69,7 +65,7 @@ public class SignCallBackTest {
     }
 
     @Test
-    public void compressPublicKeyTest(){
+    public void compressPublicKeyTest() {
         compressPublicKey("043e5eb5d55a37d325b438c563e9220ed67676c647d79070295ea028873ff8dcac0d863c385b49e7f441310a41bbd034f10cef4aa0db326b151742283abc23a666");
     }
 
@@ -78,7 +74,7 @@ public class SignCallBackTest {
         System.out.println(toCompress.substring(128, 130));
         System.out.println(Integer.parseInt(toCompress.substring(128, 130), 16));
         if (Integer.parseInt(toCompress.substring(128, 130), 16) % 2 == 0)
-            return  "02" + toCompress.substring(2, 66);
+            return "02" + toCompress.substring(2, 66);
         return "03" + toCompress.substring(2, 66);
     }
 }

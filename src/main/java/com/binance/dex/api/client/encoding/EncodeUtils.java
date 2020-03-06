@@ -2,19 +2,19 @@ package com.binance.dex.api.client.encoding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.protobuf.CodedOutputStream;
-import org.spongycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
 
 public class EncodeUtils {
-    private static final ObjectWriter OBJECT_WRITER;
+    private static final ObjectMapper OBJECT_MAPPER;
 
     static {
-        ObjectMapper mapper = new ObjectMapper();
-        OBJECT_WRITER = mapper.writer();
+        OBJECT_MAPPER = new ObjectMapper();
     }
 
     public static byte[] hexStringToByteArray(String s) {
@@ -26,7 +26,11 @@ public class EncodeUtils {
     }
 
     public static String toJsonStringSortKeys(Object object) throws JsonProcessingException {
-        return OBJECT_WRITER.writeValueAsString(object);
+        return OBJECT_MAPPER.writeValueAsString(object);
+    }
+
+    public static <T> T toObjectFromJsonString(String jsonString,Class<T> tClass) throws IOException {
+        return OBJECT_MAPPER.readValue(jsonString,tClass);
     }
 
     public static byte[] toJsonEncodeBytes(Object object) throws JsonProcessingException {
@@ -47,4 +51,21 @@ public class EncodeUtils {
         cos.flush();
         return msg;
     }
+
+    public static byte[] hashBySHA256(byte[] originData){
+        MessageDigest messageDigest;
+        try {
+            messageDigest = MessageDigest.getInstance("SHA-256");
+            return messageDigest.digest(originData);
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] long2Bytes(long x){
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.putLong(x);
+        return buffer.array();
+    }
+
 }

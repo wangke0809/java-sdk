@@ -22,6 +22,16 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     BlockMeta getBlockMetaByHash(String hash);
 
+    Token getTokenInfoBySymbol(String symbol);
+
+    List<StakeValidator> getStakeValidator();
+
+    Proposal getProposalById(String proposalId);
+
+    Account getCommittedAccount(String address);
+
+    AtomicSwap getSwapByID(String swapID);
+
     @Override
     default Time getTime() {
         throw new UnsupportedOperationException();
@@ -38,17 +48,7 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     }
 
     @Override
-    default List<Fees> getFees() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     default List<Market> getMarkets(Integer limit) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    default AccountSequence getAccountSequence(String address) {
         throw new UnsupportedOperationException();
     }
 
@@ -104,6 +104,11 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     @Override
     default List<TickerStatistics> get24HrPriceStatistics() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<TickerStatistics> get24HrPriceStatistics(String symbol) {
         throw new UnsupportedOperationException();
     }
 

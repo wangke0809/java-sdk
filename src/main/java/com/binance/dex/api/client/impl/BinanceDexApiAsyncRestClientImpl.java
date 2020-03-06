@@ -6,6 +6,7 @@ import com.binance.dex.api.client.domain.request.ClosedOrdersRequest;
 import com.binance.dex.api.client.domain.request.OpenOrdersRequest;
 import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,14 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
 
     public BinanceDexApiAsyncRestClientImpl(String baseUrl) {
         this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+    }
+
+    public BinanceDexApiAsyncRestClientImpl(String baseUrl,String apiKey){
+        if(StringUtils.isBlank(apiKey)){
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+        }else{
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class,apiKey,baseUrl + "/internal/");
+        }
     }
 
     @Override
@@ -103,12 +112,12 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
 
     @Override
     public void getClosedOrders(ClosedOrdersRequest request, BinanceDexApiCallback<OrderList> callback) {
-        String sidStr = request.getSide() == null ? null : request.getSide().name();
+        Integer side = request.getSide() == null ? null : (int)(request.getSide().toValue());
         List<String> statusStrList = null;
         if (request.getStatus() != null)
             statusStrList = request.getStatus().stream().map(s -> s.name()).collect(Collectors.toList());
         binanceDexApi.getClosedOrders(request.getAddress(), request.getEnd(), request.getLimit(),
-                request.getLimit(), sidStr, request.getStart(), statusStrList, request.getSymbol(),
+                request.getLimit(), side, request.getStart(), statusStrList, request.getSymbol(),
                 request.getTotal()).enqueue(new BinanceDexApiCallbackAdapter<>(callback));
     }
 
@@ -130,11 +139,11 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
 
     @Override
     public void getTrades(TradesRequest request, BinanceDexApiCallback<TradePage> callback) {
-        String sideStr = request.getSide() == null ? null : request.getSide().name();
+        Integer side = request.getSide() == null ? null : (int)(request.getSide().toValue());
         binanceDexApi.getTrades(
                 request.getAddress(), request.getBuyerOrderId(),
                 request.getEnd(), request.getHeight(), request.getLimit(), request.getOffset(),
-                request.getQuoteAsset(), request.getSellerOrderId(), sideStr,
+                request.getQuoteAsset(), request.getSellerOrderId(), side,
                 request.getStart(), request.getSymbol(), request.getTotal()).enqueue(
                 new BinanceDexApiCallbackAdapter<>(callback));
     }

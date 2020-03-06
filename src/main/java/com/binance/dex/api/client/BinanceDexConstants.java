@@ -7,7 +7,7 @@ public class BinanceDexConstants {
     /**
      * Identifier of this client.
      */
-    public static final long BINANCE_DEX_API_CLIENT_JAVA_SOURCE = 3L;
+    public static final long BINANCE_DEX_API_CLIENT_JAVA_SOURCE = 0L;
 
     /**
      * Default ToStringStyle used by toString methods.
@@ -15,4 +15,11 @@ public class BinanceDexConstants {
      * - Example ToStringStyle.JSON_STYLE
      */
     public static final ToStringStyle BINANCE_DEX_TO_STRING_STYLE = ToStringStyle.SHORT_PREFIX_STYLE;
+
+    /**
+     * HTTP Header to be used for API-KEY authentication.
+     */
+    public static final String API_KEY_HEADER = "apikey";
+
+
 }

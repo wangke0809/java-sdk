@@ -9,6 +9,7 @@ import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
 import com.binance.dex.api.client.encoding.message.TransactionRequestAssembler;
 import okhttp3.RequestBody;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -21,9 +22,18 @@ import java.util.stream.Collectors;
  */
 public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
     private BinanceDexApi binanceDexApi;
+    private static final okhttp3.MediaType MEDIA_TYPE = okhttp3.MediaType.parse("text/plain; charset=utf-8");
 
     public BinanceDexApiRestClientImpl(String baseUrl) {
         this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+    }
+
+    public BinanceDexApiRestClientImpl(String baseUrl,String apiKey){
+        if(StringUtils.isBlank(apiKey)){
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+        }else{
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class,apiKey,baseUrl + "/internal/");
+        }
     }
 
     public Time getTime() {
@@ -97,13 +107,13 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
     }
 
     public OrderList getClosedOrders(ClosedOrdersRequest request) {
-        String sidStr = request.getSide() == null ? null : request.getSide().name();
+        Integer side = request.getSide() == null ? null : (int)(request.getSide().toValue());
         List<String> statusStrList = null;
         if (request.getStatus() != null)
             statusStrList = request.getStatus().stream().map(s -> s.name()).collect(Collectors.toList());
         return BinanceDexApiClientGenerator.executeSync(
                 binanceDexApi.getClosedOrders(request.getAddress(), request.getEnd(), request.getLimit(),
-                        request.getLimit(), sidStr, request.getStart(), statusStrList, request.getSymbol(),
+                        request.getLimit(), side, request.getStart(), statusStrList, request.getSymbol(),
                         request.getTotal()));
     }
 
@@ -115,6 +125,10 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         return BinanceDexApiClientGenerator.executeSync(binanceDexApi.get24HrPriceStatistics());
     }
 
+    public List<TickerStatistics> get24HrPriceStatistics(String symbol){
+        return BinanceDexApiClientGenerator.executeSync(binanceDexApi.get24HrPriceStatistics(symbol));
+    }
+
     @Override
     public TradePage getTrades() {
         TradesRequest request = new TradesRequest();
@@ -123,12 +137,12 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
 
     @Override
     public TradePage getTrades(TradesRequest request) {
-        String sideStr = request.getSide() == null ? null : request.getSide().name();
+        Integer side = request.getSide() == null ? null : (int)(request.getSide().toValue());
         return BinanceDexApiClientGenerator.executeSync(
                 binanceDexApi.getTrades(
                         request.getAddress(), request.getBuyerOrderId(),
                         request.getEnd(), request.getHeight(), request.getLimit(), request.getOffset(),
-                        request.getQuoteAsset(), request.getSellerOrderId(), sideStr,
+                        request.getQuoteAsset(), request.getSellerOrderId(), side,
                         request.getStart(), request.getSymbol(), request.getTotal()));
     }
 
@@ -220,5 +234,47 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
         RequestBody requestBody = assembler.buildTokenUnfreeze(unfreeze);
         return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> htlt(HtltReq htltReq, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildHtlt(htltReq);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> depositHtlt(String swapId, List<com.binance.dex.api.client.encoding.message.Token> amount, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildDepositHtlt(swapId,amount);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> claimHtlt(String swapId, byte[] randomNumber, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildClaimHtlt(swapId,randomNumber);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> refundHtlt(String swapId, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildRefundHtlt(swapId);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> broadcast(String payload, boolean sync) {
+        try {
+            return BinanceDexApiClientGenerator.executeSync(binanceDexApi.broadcast(sync, RequestBody.create(MEDIA_TYPE, payload)));
+        } catch (BinanceDexApiException e) {
+            throw e;
+        }
     }
 }
