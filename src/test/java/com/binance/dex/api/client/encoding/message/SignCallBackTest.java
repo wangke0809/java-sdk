@@ -1,7 +1,5 @@
 package com.binance.dex.api.client.encoding.message;
 
-import com.binance.dex.api.client.BinanceDexApiClientFactory;
-import com.binance.dex.api.client.BinanceDexApiNodeClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.TransactionMetadata;
@@ -14,7 +12,6 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -27,7 +24,7 @@ import java.util.List;
  */
 @Ignore("Manual run only")
 public class SignCallBackTest {
-    BinanceDexApiNodeCustomClient binanceDexNodeApi = new BinanceDexApiNodeCustomClient(BinanceDexEnvironment.TEST_NET_NODE.getBaseUrl(), BinanceDexEnvironment.TEST_NET_NODE.getHrp());
+    BinanceDexApiNodeCustomClient binanceDexNodeApi = new BinanceDexApiNodeCustomClient(BinanceDexEnvironment.TEST_NET.getNodeUrl(), BinanceDexEnvironment.TEST_NET.getHrp());
 
     @Test
     public void test() throws Exception{
