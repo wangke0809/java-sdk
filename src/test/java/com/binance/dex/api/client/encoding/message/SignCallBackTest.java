@@ -3,6 +3,7 @@ package com.binance.dex.api.client.encoding.message;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.TransactionMetadata;
+import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.TransactionOption;
 import com.binance.dex.api.client.domain.broadcast.Transfer;
 import com.binance.dex.api.client.encoding.Crypto;
@@ -77,5 +78,13 @@ public class SignCallBackTest {
         if (Integer.parseInt(toCompress.substring(128, 130), 16) % 2 == 0)
             return  "02" + toCompress.substring(2, 66);
         return "03" + toCompress.substring(2, 66);
+    }
+
+    @Test
+    public void getTx(){
+        final List<Transaction> blockTransactions = binanceDexNodeApi.getBlockTransactions(1288291L);
+        for (Transaction blockTransaction : blockTransactions) {
+            System.out.println(blockTransaction.getHash());
+        }
     }
 }

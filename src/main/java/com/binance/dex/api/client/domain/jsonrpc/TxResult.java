@@ -73,6 +73,7 @@ public class TxResult {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Event{
         private List<Attribute> attributes;
 
