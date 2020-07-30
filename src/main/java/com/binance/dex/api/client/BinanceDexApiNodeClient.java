@@ -22,6 +22,18 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     BlockMeta getBlockMetaByHash(String hash);
 
+    Token getTokenInfoBySymbol(String symbol);
+
+    List<StakeValidator> getStakeValidator();
+
+    Proposal getProposalById(String proposalId);
+
+    Account getCommittedAccount(String address);
+
+    AtomicSwap getSwapByID(String swapID);
+
+    MiniToken getMiniTokenInfoBySymbol(String symbol);
+
     @Override
     default Time getTime() {
         throw new UnsupportedOperationException();
@@ -38,17 +50,7 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     }
 
     @Override
-    default List<Fees> getFees() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     default List<Market> getMarkets(Integer limit) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    default AccountSequence getAccountSequence(String address) {
         throw new UnsupportedOperationException();
     }
 
@@ -108,6 +110,11 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     }
 
     @Override
+    default List<TickerStatistics> get24HrPriceStatistics(String symbol) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     default TradePage getTrades() {
         throw new UnsupportedOperationException();
     }
@@ -124,6 +131,71 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     @Override
     default TransactionPage getTransactions(TransactionsRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<MiniToken> getMiniTokens(Integer limit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<Market> getMiniMarkets(Integer limit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<Candlestick> getMiniCandleStickBars(String symbol, CandlestickInterval interval) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<Candlestick> getMiniCandleStickBars(String symbol, CandlestickInterval interval, Integer limit, Long startTime, Long endTime) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniOpenOrders(String address) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniOpenOrders(OpenOrdersRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniClosedOrders(String address) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniClosedOrders(ClosedOrdersRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default Order getMiniOrder(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<TickerStatistics> getMini24HrPriceStatistics() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<TickerStatistics> getMini24HrPriceStatistics(String symbol) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default TradePage getMiniTrades() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default TradePage getMiniTrades(TradesRequest request) {
         throw new UnsupportedOperationException();
     }
 

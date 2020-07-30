@@ -3,6 +3,7 @@ package com.binance.dex.api.client;
 import com.binance.dex.api.client.impl.BinanceDexApiAsyncRestClientImpl;
 import com.binance.dex.api.client.impl.BinanceDexApiNodeClientImpl;
 import com.binance.dex.api.client.impl.BinanceDexApiRestClientImpl;
+import com.binance.dex.api.client.impl.BinanceDexApiWebSocketClientImpl;
 
 public class BinanceDexApiClientFactory {
     private BinanceDexApiClientFactory() {
@@ -20,8 +21,12 @@ public class BinanceDexApiClientFactory {
         return new BinanceDexApiRestClientImpl(baseUrl);
     }
 
+    public BinanceDexApiRestClient newRestClient(String baseUrl,String apiKey){
+        return new BinanceDexApiRestClientImpl(baseUrl,apiKey);
+    }
+
     public BinanceDexApiNodeClient newNodeRpcClient() {
-        return newNodeRpcClient(BinanceDexEnvironment.TEST_NET_NODE.getBaseUrl(), BinanceDexEnvironment.TEST_NET_NODE.getHrp());
+        return newNodeRpcClient(BinanceDexEnvironment.PROD.getNodeUrl(), BinanceDexEnvironment.PROD.getHrp());
     }
 
     public BinanceDexApiNodeClient newNodeRpcClient(String baseUrl, String hrp) {
@@ -34,6 +39,22 @@ public class BinanceDexApiClientFactory {
 
     public BinanceDexApiAsyncRestClient newAsyncRestClient(String baseUrl) {
         return new BinanceDexApiAsyncRestClientImpl(baseUrl);
+    }
+
+    public BinanceDexApiAsyncRestClient newAsyncRestClient(String baseUrl,String apiKey) {
+        return new BinanceDexApiAsyncRestClientImpl(baseUrl,apiKey);
+    }
+
+    public BinanceDexApiWebSocketClient newWebSocketClient() {
+        return new BinanceDexApiWebSocketClientImpl(BinanceDexEnvironment.PROD.getStreamUrl());
+    }
+
+    public BinanceDexApiWebSocketClient newWebSocketClient(String baseUrl) {
+        return new BinanceDexApiWebSocketClientImpl(baseUrl);
+    }
+
+    public BinanceDexApiWebSocketClient newWebSocketClient(String baseUrl,String apiKey) {
+        return new BinanceDexApiWebSocketClientImpl(baseUrl,apiKey);
     }
 
 }

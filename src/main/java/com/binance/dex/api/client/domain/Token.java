@@ -12,7 +12,7 @@ public class Token {
     @JsonProperty("original_symbol")
     private String originalSymbol;
     @JsonProperty("total_supply")
-    private String totalSupply;
+    private Long totalSupply;
     private String owner;
     private boolean mintable;
 
@@ -38,14 +38,6 @@ public class Token {
 
     public void setOriginalSymbol(String originalSymbol) {
         this.originalSymbol = originalSymbol;
-    }
-
-    public String getTotalSupply() {
-        return totalSupply;
-    }
-
-    public void setTotalSupply(String totalSupply) {
-        this.totalSupply = totalSupply;
     }
 
     public String getOwner() {
@@ -74,5 +66,22 @@ public class Token {
                 .append("owner", owner)
                 .append("mintable", mintable)
                 .toString();
+    }
+
+    public void setTotalSupply(Long totalSupply) {
+        this.totalSupply = totalSupply;
+    }
+
+    public Long getTotalSupply() {
+        return totalSupply;
+    }
+
+    public void setTotalSupply(String totalSupply){
+        if (totalSupply != null) {
+            if (totalSupply.indexOf('.') > 0) {
+                totalSupply = totalSupply.substring(0, totalSupply.indexOf('.'));
+                this.totalSupply = Long.parseLong(totalSupply) * 100000000L;
+            }
+        }
     }
 }

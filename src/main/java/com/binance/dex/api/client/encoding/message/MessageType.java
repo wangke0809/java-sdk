@@ -5,7 +5,7 @@ import com.binance.dex.api.client.encoding.EncodeUtils;
 import java.util.Arrays;
 
 /**
- * Binance dex standard transactiont types.
+ * Binance dex standard transaction types.
  */
 public enum MessageType {
     Send("2A2C87FA"),
@@ -20,7 +20,25 @@ public enum MessageType {
     Issue("17EFAB80"),
     Burn("7ED2D2A0"),
     Mint("467E0829"),
-    SubmitProposal("B42D614E");
+    SubmitProposal("B42D614E"),
+    Deposit("A18A56E5"),
+    CreateValidator("DB6A19FD"),
+    RemoveValidator("C1AFE85F"),
+    Listing("B41DE13F"),
+    TimeLock("07921531"),
+    TimeUnlock("C4050C6C"),
+    TimeRelock("504711DA"),
+    SetAccountFlag("BEA6E301"),
+    HashTimerLockTransferMsg("B33F9A24"),
+    DepositHashTimerLockMsg("63986496"),
+    ClaimHashTimerLockMsg("C1665300"),
+    RefundHashTimerLockMsg("3454A27C"),
+
+    //mini token
+    TinyTokenIssue("ED2832D4"),
+    MiniTokenIssue("A3F16C41"),
+    MiniTokenSetURI("7B1D34E7"),
+    MiniTokenList("4C264019");
 
     private byte[] typePrefixBytes;
 

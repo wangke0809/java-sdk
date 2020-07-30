@@ -5,11 +5,9 @@ import com.binance.dex.api.client.BinanceDexApiClientFactory;
 import com.binance.dex.api.client.BinanceDexApiNodeClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.Wallet;
-import com.binance.dex.api.client.domain.Account;
-import com.binance.dex.api.client.domain.BlockMeta;
-import com.binance.dex.api.client.domain.Infos;
-import com.binance.dex.api.client.domain.TransactionMetadata;
+import com.binance.dex.api.client.domain.*;
 import com.binance.dex.api.client.domain.broadcast.*;
+import com.binance.dex.api.client.domain.broadcast.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -30,7 +28,7 @@ public class NodeClientExample {
 
     @Before
     public void setup() {
-        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient();
+        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.TEST_NET.getNodeUrl(),BinanceDexEnvironment.TEST_NET.getHrp());
     }
 
     @Test
@@ -41,11 +39,45 @@ public class NodeClientExample {
     }
 
     @Test
+    public void testCommittedAccount(){
+        String address = "tbnb16hywxpvvkaz6cecjz89mf2w0da3vfeg6z6yky2";
+        Account account = binanceDexNodeApi.getCommittedAccount(address);
+        Assert.assertEquals(address, account.getAddress());
+    }
+
+    @Test
     public void testBlockTransactions() {
+        //Mini Issue
+        Long height = 87908207L;
+        List<Transaction> transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_ISSUE);
+
+        //Tiny Issue
+        height = 86888933L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.TINY_TOKEN_ISSUE);
+
+        //List Mini
+        height = 86890587L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_LIST);
+
+        //Set token uri
+        height = 86881980L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_SET_URI);
 
         //Transfer
-        Long height = 7794210L;
-        List<Transaction> transactions = binanceDexNodeApi.getBlockTransactions(height);
+        height = 33896036L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
         Assert.assertNotNull(transactions);
         Assert.assertTrue(transactions.size() == 1);
         Assert.assertEquals(transactions.get(0).getTxType(), TxType.TRANSFER);
@@ -121,7 +153,7 @@ public class NodeClientExample {
         transfer.setCoin(symbol);
         transfer.setFromAddress(wallet.getAddress());
         transfer.setToAddress("tbnb16hywxpvvkaz6cecjz89mf2w0da3vfeg6z6yky2");
-        transfer.setAmount("1.1");
+        transfer.setAmount("0.001");
         TransactionOption options = new TransactionOption("test1g2g", 1, null);
         List<TransactionMetadata> resp = binanceDexNodeApi.transfer(transfer, wallet, options, true);
 
@@ -173,12 +205,12 @@ public class NodeClientExample {
         List<Output> outputs = new ArrayList<>();
 
         List<OutputToken> outputTokens1 = new ArrayList<OutputToken>();
-        outputTokens1.add(new OutputToken("BNB", "0.1"));
+        outputTokens1.add(new OutputToken("BNB", "0.00001"));
         outputTokens1.add(new OutputToken("XRP.B-585", "0.1"));
         Output o1 = new Output("tbnb1mrslq6lhglm3jp7pxzlk8u4549pmtp9sgvn2rc", outputTokens1);
 
         List<OutputToken> outputTokens2 = new ArrayList<OutputToken>();
-        outputTokens2.add(new OutputToken("BNB", "0.1"));
+        outputTokens2.add(new OutputToken("BNB", "0.00001"));
         Output o2 = new Output("tbnb1sadf5e0gdpg757zefd6yru086cknjyttudg532", outputTokens2);
 
         outputs.add(o1);
@@ -200,9 +232,9 @@ public class NodeClientExample {
 
     @Test
     public void testGetTransaction() {
-        Transaction transaction = binanceDexNodeApi.getTransaction("9A4EFAEAC70A9115AD88B540FED7515D5DDBECF2BB19C0A7CBDC4E3F5053ECB8");
+        Transaction transaction = binanceDexNodeApi.getTransaction("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F");
         Assert.assertNotNull(transaction);
-        Assert.assertEquals("9A4EFAEAC70A9115AD88B540FED7515D5DDBECF2BB19C0A7CBDC4E3F5053ECB8", transaction.getHash());
+        Assert.assertEquals("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F", transaction.getHash());
         Assert.assertEquals(0, transaction.getCode().intValue());
     }
 
@@ -218,5 +250,39 @@ public class NodeClientExample {
         BlockMeta blockMeta = binanceDexNodeApi.getBlockMetaByHash("6FACD5586859B67AD5B5BABF0A0DC971AF91215DEBB9EF3D2F3847E4D2D97DDD");
         Assert.assertNotNull(blockMeta);
         Assert.assertEquals(8665773L, blockMeta.getHeader().getHeight().longValue());
+    }
+
+    @Test
+    public void testGetTokenInfoBySymbol(){
+        Token token = binanceDexNodeApi.getTokenInfoBySymbol("BNB");
+        Assert.assertNotNull(token);
+        Assert.assertEquals("BNB",token.getSymbol());
+    }
+
+    @Test
+    public void testGetMiniTokenInfoBySymbol(){
+        MiniToken token = binanceDexNodeApi.getMiniTokenInfoBySymbol("TTT-873M");
+        Assert.assertNotNull(token);
+        Assert.assertEquals("TTT-873M",token.getSymbol());
+    }
+
+    @Test
+    public void testGetFees() {
+        List<Fees> feesList = binanceDexNodeApi.getFees();
+        Assert.assertNotNull(feesList);
+        Assert.assertTrue(feesList.size() > 0);
+    }
+
+    @Test
+    public void testStakeValidator() {
+        List<StakeValidator> stakeValidators = binanceDexNodeApi.getStakeValidator();
+        Assert.assertNotNull(stakeValidators);
+        Assert.assertTrue(stakeValidators.size() > 0);
+    }
+
+    @Test
+    public void testGetProposalById(){
+        Proposal proposal = binanceDexNodeApi.getProposalById("1");
+        Assert.assertEquals("1",proposal.getValue().getProposalId());
     }
 }

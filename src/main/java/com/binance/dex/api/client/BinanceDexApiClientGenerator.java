@@ -1,11 +1,13 @@
 package com.binance.dex.api.client;
 
+import com.binance.dex.api.client.impl.InternalInvokeInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import okhttp3.Dispatcher;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import org.apache.commons.lang3.StringUtils;
 import retrofit2.Call;
 import retrofit2.Converter;
 import retrofit2.Response;
@@ -48,6 +50,24 @@ public class BinanceDexApiClientGenerator {
         return retrofit.create(serviceClass);
     }
 
+    public static <S> S createService(Class<S> serviceClass, String apiKey, String baseUrl) {
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(converterFactory);
+
+        if (StringUtils.isEmpty(apiKey)) {
+            retrofitBuilder.client(sharedClient);
+        } else {
+            // `adaptedClient` will use its own interceptor, but share thread pool etc with the 'parent' client
+            InternalInvokeInterceptor interceptor = new InternalInvokeInterceptor(apiKey);
+            OkHttpClient adaptedClient = sharedClient.newBuilder().addInterceptor(interceptor).build();
+            retrofitBuilder.client(adaptedClient);
+        }
+
+        Retrofit retrofit = retrofitBuilder.build();
+        return retrofit.create(serviceClass);
+    }
+
     /**
      * Execute a REST call and block until the response is received.
      */
@@ -61,7 +81,7 @@ public class BinanceDexApiClientGenerator {
                     BinanceDexApiError apiError = getBinanceApiError(response);
                     throw new BinanceDexApiException(apiError);
                 } catch (IOException e) {
-                    throw new BinanceDexApiException(response.toString(), e);
+                    throw new BinanceDexApiException(response.code(), response.toString());
                 }
             }
         } catch (IOException e) {

@@ -10,5 +10,21 @@ public enum TxType {
     ISSUE,
     BURN,
     MINT,
-    SUBMIT_PROPOSAL
+    SUBMIT_PROPOSAL,
+    DEPOSIT,
+    CREATE_VALIDATOR,
+    REMOVE_VALIDATOR,
+    LISTING,
+    TimeLock,
+    TimeUnlock,
+    TimeRelock,
+    SetAccountFlag,
+    HTL_TRANSFER,
+    CLAIM_HTL,
+    REFUND_HTL,
+    DEPOSIT_HTL,
+    TINY_TOKEN_ISSUE,
+    MINI_TOKEN_ISSUE,
+    MINI_TOKEN_SET_URI,
+    MINI_TOKEN_LIST
 }

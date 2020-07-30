@@ -8,11 +8,29 @@ import retrofit2.http.Query;
 
 public interface BinanceDexNodeApi {
 
+    @GET("/abci_query")
+    Call<JsonRpcResponse<AccountResult>> getAccount(@Query("path") String pathWithAddress);
+
     @GET("/abci_query?path=%22/store/acc/key%22")
-    Call<JsonRpcResponse<AccountResult>> getAccount(@Query("data") String address);
+    Call<JsonRpcResponse<AccountResult>> getCommittedAccount(@Query("data") String address);
+
+    @GET("/abci_query")
+    Call<JsonRpcResponse<ABCIQueryResult>> getTokenInfo(@Query("path") String pathWithSymbol);
+
+    @GET("/abci_query?path=%22/param/fees%22")
+    Call<JsonRpcResponse<ABCIQueryResult>> getFees();
+
+    @GET("abci_query?path=%22custom/atomicSwap/swapid%22")
+    Call<JsonRpcResponse<ABCIQueryResult>> getSwapByID(@Query("data") String data);
+
+    @GET("/abci_query?path=%22custom/stake/validators%22")
+    Call<JsonRpcResponse<ABCIQueryResult>> getStakeValidators();
+
+    @GET("/abci_query?path=%22custom/gov/proposal%22")
+    Call<JsonRpcResponse<ABCIQueryResult>> getProposalById(@Query("data") String data);
 
     @GET("/tx_search")
-    Call<JsonRpcResponse<BlockInfoResult>> getBlockTransactions(@Query("query") String height);
+    Call<JsonRpcResponse<BlockInfoResult>> getBlockTransactions(@Query("query") String height,@Query("page") int page,@Query("per_page") int perPage);
 
     @GET("/broadcast_tx_commit")
     Call<JsonRpcResponse<CommitBroadcastResult>> commitBroadcast(@Query("tx") String tx);
